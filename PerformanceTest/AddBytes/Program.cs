@@ -1,12 +1,12 @@
-﻿using System;
+﻿using BenchmarkDotNet.Running;
 
-namespace AddBytes
+namespace SumTests
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var summary = BenchmarkRunner.Run<SumBytes>();
         }
     }
 }
