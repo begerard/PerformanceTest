@@ -10,9 +10,9 @@ Just a Sum of various numeric type arrays done in various way, ordered by perfor
 3. Fixed: Same For loop but inside a fixed statement
 4. Unrolled: A For loop where each loop executes 4 incrementations instead of 1
 5. Vectorization: A For loop where the array is Sliced in 4 part
-6. SIMD: A for loop over Intrinsics Add
+6. SIMD: A For loop over Intrinsics Add
 
-Here are the result with a Haswell - Intel architecture released in 2013 - CPU (i5-4690K @ 4.4GHz) as older ones won't support as much optimizations:
+Here are the result with a Haswell CPU (i5-4690K @ 4.4GHz) as older ones won't support as much optimizations:
 
 ### Byte[10 000]
 |           Method |      Mean |   Error |  StdDev | Ratio |
