@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Running;
+﻿using System;
+
+using BenchmarkDotNet.Running;
 
 namespace SumTests
 {
@@ -6,7 +8,14 @@ namespace SumTests
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<SumBytes>();
+#if DEBUG
+            var instance = new SumBytes();
+            instance.SimdSum();
+#endif
+
+#if RELEASE
+            BenchmarkRunner.Run<SumBytes>();
+#endif
         }
     }
 }
