@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.X86;
 
 using BenchmarkDotNet.Attributes;
 
 namespace SumTests
 {
-    public class SumBytes
+    public class SumInt
     {
         private const int N = 10000;
-        private readonly byte[] data;
+        private readonly byte[] source;
+        private readonly int[] data;
 
-        public SumBytes()
+        public SumInt()
         {
-            data = new byte[N];
-            new Random(1).NextBytes(data);
+            source = new byte[N];
+            new Random(1).NextBytes(source);
+            data = new int[N];
+            Array.Copy(source, data, N);
         }
 
         [Benchmark]
@@ -41,7 +46,7 @@ namespace SumTests
             int result = 0;
             var span = data.AsSpan();
 
-            fixed (byte* pSpan = span)
+            fixed (int* pSpan = span)
             {
                 for (int i = 0; i < span.Length; i++)
                 {
@@ -62,7 +67,7 @@ namespace SumTests
             var span = data.AsSpan();
             int lastBlockIndex = data.Length - (data.Length % SIZE);
 
-            fixed (byte* pSpan = span)
+            fixed (int* pSpan = span)
             {
                 for (int i = 0; i < lastBlockIndex; i += 4)
                 {
@@ -115,6 +120,37 @@ namespace SumTests
             result += partial4;
 
             int lastBlockIndex = data.Length - (data.Length % SIZE);
+            for (int i = lastBlockIndex; i < span.Length; i++)
+            {
+                result += span[i];
+            }
+
+            return result;
+        }
+
+        [Benchmark]
+        public unsafe int SimdSum()
+        {
+            int SIZE = 4;
+
+            int result = 0;
+            Vector128<int> vResult = Vector128<int>.Zero;
+
+            var span = data.AsSpan();
+            int lastBlockIndex = data.Length - (data.Length % SIZE);
+
+            fixed (int* pSpan = span)
+            {
+                for (int i = 0; i < lastBlockIndex; i += SIZE)
+                {
+                    vResult = Avx2.Add(vResult, Avx2.LoadVector128(pSpan + i));
+                }
+            }
+
+            vResult = Avx2.HorizontalAdd(vResult, vResult);
+            vResult = Avx2.HorizontalAdd(vResult, vResult);
+            result = vResult.ToScalar();
+
             for (int i = lastBlockIndex; i < span.Length; i++)
             {
                 result += span[i];

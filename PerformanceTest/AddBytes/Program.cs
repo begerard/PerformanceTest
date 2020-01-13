@@ -10,11 +10,12 @@ namespace SumTests
         {
 #if DEBUG
             var instance = new SumBytes();
-            instance.SimdSum();
+            instance.VectorizedForSum();
 #endif
 
 #if RELEASE
             BenchmarkRunner.Run<SumBytes>();
+            BenchmarkRunner.Run<SumInt>();
 #endif
         }
     }
