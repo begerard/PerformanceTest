@@ -22,7 +22,7 @@ namespace SumTests
             return data.Sum(i => i);
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public int ForSum()
         {
             int result = 0;
