@@ -21,7 +21,7 @@ namespace SumTests
             instance2.SseSum();
             instance2.AvxSum();
 
-            var instance3 = new SumDouble();
+            var instance3 = new SumLong();
             instance3.ForSum();
             instance3.UnrolledForSum();
             instance3.VectorizedForSum();
