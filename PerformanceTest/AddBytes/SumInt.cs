@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.Intrinsics;
-using System.Runtime.Intrinsics.X86;
-
 using BenchmarkDotNet.Attributes;
+using System;
+using System.Linq;
 
 namespace SumTests
 {
@@ -22,10 +19,7 @@ namespace SumTests
         }
 
         [Benchmark]
-        public int LinqSum()
-        {
-            return data.Sum(i => i);
-        }
+        public int LinqSum() => data.Sum();
 
         [Benchmark(Baseline = true)]
         public int ForSum()
@@ -41,24 +35,21 @@ namespace SumTests
         }
 
         [Benchmark]
-        public unsafe int FixedForSum()
+        public int SpanForSum()
         {
             int result = 0;
             var span = data.AsSpan();
 
-            fixed (int* pSpan = span)
+            for (int i = 0; i < span.Length; i++)
             {
-                for (int i = 0; i < span.Length; i++)
-                {
-                    result += span[i];
-                };
-            }
+                result += span[i];
+            };
 
             return result;
         }
 
         [Benchmark]
-        public unsafe int UnrolledForSum()
+        public int UnrolledForSum()
         {
             //number of unrolling
             const int SIZE = 4;
@@ -67,20 +58,17 @@ namespace SumTests
             var span = data.AsSpan();
             int lastBlockIndex = data.Length - (data.Length % SIZE);
 
-            fixed (int* pSpan = span)
+            for (int i = 0; i < lastBlockIndex; i += 4)
             {
-                for (int i = 0; i < lastBlockIndex; i += 4)
-                {
-                    result += pSpan[i + 0];
-                    result += pSpan[i + 1];
-                    result += pSpan[i + 2];
-                    result += pSpan[i + 3];
-                }
+                result += span[i + 0];
+                result += span[i + 1];
+                result += span[i + 2];
+                result += span[i + 3];
+            }
 
-                for (int i = lastBlockIndex; i < span.Length; i++)
-                {
-                    result += span[i];
-                }
+            for (int i = lastBlockIndex; i < span.Length; i++)
+            {
+                result += span[i];
             }
 
             return result;
@@ -101,7 +89,7 @@ namespace SumTests
             int sliceLenght = data.Length / SIZE;
 
             var span = data.AsSpan();
-            var slice1 = span.Slice(0, sliceLenght);
+            var slice1 = span[..sliceLenght];
             var slice2 = span.Slice(sliceLenght, sliceLenght);
             var slice3 = span.Slice(sliceLenght * 2, sliceLenght);
             var slice4 = span.Slice(sliceLenght * 3, sliceLenght);
@@ -128,74 +116,74 @@ namespace SumTests
             return result;
         }
 
-        [Benchmark]
-        public unsafe int SseSum()
-        {
-            const int TYPE_SIZE_PER_VECTOR = 4;
+        //[Benchmark]
+        //public unsafe int SseSum()
+        //{
+        //    const int TYPE_SIZE_PER_VECTOR = 4;
 
-            int result = 0;
-            Vector128<int> vResult = Vector128<int>.Zero;
+        //    int result = 0;
+        //    Vector128<int> vResult = Vector128<int>.Zero;
 
-            var span = data.AsSpan();
-            int lastBlockIndex = data.Length - (data.Length % TYPE_SIZE_PER_VECTOR);
+        //    var span = data.AsSpan();
+        //    int lastBlockIndex = data.Length - (data.Length % TYPE_SIZE_PER_VECTOR);
 
-            fixed (int* pSpan = span)
-            {
-                for (int i = 0; i < lastBlockIndex; i += TYPE_SIZE_PER_VECTOR)
-                {
-                    vResult = Sse2.Add(vResult, Sse2.LoadVector128(pSpan + i));
-                }
-            }
+        //    fixed (int* pSpan = span)
+        //    {
+        //        for (int i = 0; i < lastBlockIndex; i += TYPE_SIZE_PER_VECTOR)
+        //        {
+        //            vResult = Sse2.Add(vResult, Sse2.LoadVector128(pSpan + i));
+        //        }
+        //    }
 
-            var temp = stackalloc int[TYPE_SIZE_PER_VECTOR];
-            Sse2.Store(temp, vResult);
+        //    var temp = stackalloc int[TYPE_SIZE_PER_VECTOR];
+        //    Sse2.Store(temp, vResult);
 
-            for (int j = 0; j < TYPE_SIZE_PER_VECTOR; j++)
-            {
-                result += temp[j];
-            }
+        //    for (int j = 0; j < TYPE_SIZE_PER_VECTOR; j++)
+        //    {
+        //        result += temp[j];
+        //    }
 
-            for (int i = lastBlockIndex; i < span.Length; i++)
-            {
-                result += span[i];
-            }
+        //    for (int i = lastBlockIndex; i < span.Length; i++)
+        //    {
+        //        result += span[i];
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        [Benchmark]
-        public unsafe int AvxSum()
-        {
-            const int TYPE_SIZE_PER_VECTOR = 8;
+        //[Benchmark]
+        //public unsafe int AvxSum()
+        //{
+        //    const int TYPE_SIZE_PER_VECTOR = 8;
 
-            int result = 0;
-            Vector256<int> vResult = Vector256<int>.Zero;
+        //    int result = 0;
+        //    Vector256<int> vResult = Vector256<int>.Zero;
 
-            var span = data.AsSpan();
-            int lastBlockIndex = data.Length - (data.Length % TYPE_SIZE_PER_VECTOR);
+        //    var span = data.AsSpan();
+        //    int lastBlockIndex = data.Length - (data.Length % TYPE_SIZE_PER_VECTOR);
 
-            fixed (int* pSpan = span)
-            {
-                for (int i = 0; i < lastBlockIndex; i += TYPE_SIZE_PER_VECTOR)
-                {
-                    vResult = Avx2.Add(vResult, Avx2.LoadVector256(pSpan + i));
-                }
-            }
+        //    fixed (int* pSpan = span)
+        //    {
+        //        for (int i = 0; i < lastBlockIndex; i += TYPE_SIZE_PER_VECTOR)
+        //        {
+        //            vResult = Avx2.Add(vResult, Avx2.LoadVector256(pSpan + i));
+        //        }
+        //    }
 
-            var temp = stackalloc int[TYPE_SIZE_PER_VECTOR];
-            Avx2.Store(temp, vResult);
+        //    var temp = stackalloc int[TYPE_SIZE_PER_VECTOR];
+        //    Avx2.Store(temp, vResult);
 
-            for (int j = 0; j < TYPE_SIZE_PER_VECTOR; j++)
-            {
-                result += temp[j];
-            }
+        //    for (int j = 0; j < TYPE_SIZE_PER_VECTOR; j++)
+        //    {
+        //        result += temp[j];
+        //    }
 
-            for (int i = lastBlockIndex; i < span.Length; i++)
-            {
-                result += span[i];
-            }
+        //    for (int i = lastBlockIndex; i < span.Length; i++)
+        //    {
+        //        result += span[i];
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
     }
 }
