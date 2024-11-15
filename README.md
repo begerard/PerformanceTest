@@ -137,7 +137,7 @@ Update to 8.0 as Linq now use intinsics.
 |----------------- |---------:|----------:|----------:|------:|
 | LinqSum          | 1.630 us | 0.0280 us | 0.0234 us |  0.35 |
 | ForSum           | 4.668 us | 0.0918 us | 0.0901 us |  1.00 |
-| FixedForSum      | 3.891 us | 0.0558 us | 0.0495 us |  0.83 |
+| SpanForSum       | 3.891 us | 0.0558 us | 0.0495 us |  0.83 |
 | UnrolledForSum   | 2.444 us | 0.0421 us | 0.0413 us |  0.52 |
 | VectorizedForSum | 1.556 us | 0.0309 us | 0.0303 us |  0.33 |
 
@@ -151,7 +151,7 @@ Update to 8.0 as Linq now use intinsics.
 | VectorizedForSum |  7.018 us | 0.1035 us | 0.0918 us |  0.71 |
 
 ### Commentary
-1. LINQ is now the best pick as long as you do net give it a Func:
+1. LINQ is now the best pick as long as you do not give it a Func:
     1. When there is a Sum method with the good type, its use of intrinsics make it as performant as the vectorized case.
     2. When you have to give a Func to the Linq method, you now are only 2 times slower.
 2. Simplest algorithm I used as performance baseline.
@@ -161,3 +161,48 @@ Update to 8.0 as Linq now use intinsics.
 
 * The upgrade of Linq make it a simpler alternative to the Vectorize solution but only if the native methods fit the case.
 * If you need to give a delegate to execute to the Linq method it will be slower than a For loop.
+
+## .Net 9.0
+
+### Byte[10 000]
+| Method           | Mean      | Error     | StdDev    | Ratio |
+|----------------- |----------:|----------:|----------:|------:|
+| LinqSumCast      | 11.017 us | 0.0790 us | 0.0739 us |  2.77 |
+| ForSum           |  3.981 us | 0.0387 us | 0.0362 us |  1.00 |
+| SpanForSum       |  3.315 us | 0.0464 us | 0.0387 us |  0.83 |
+| UnrolledForSum   |  2.473 us | 0.0415 us | 0.0389 us |  0.62 |
+| VectorizedForSum |  1.480 us | 0.0189 us | 0.0186 us |  0.37 |
+
+### Int32[10 000]
+| Method           | Mean      | Error     | StdDev    | Ratio |
+|----------------- |----------:|----------:|----------:|------:|
+| LinqSum          | 0.6319 us | 0.0087 us | 0.0081 us |  0.16 |
+| ForSum           | 3.8573 us | 0.0604 us | 0.0565 us |  1.00 |
+| SpanForSum       | 2.9409 us | 0.0486 us | 0.0454 us |  0.76 |
+| UnrolledForSum   | 2.4531 us | 0.0387 us | 0.0362 us |  0.64 |
+| VectorizedForSum | 1.4416 us | 0.0273 us | 0.0255 us |  0.37 |
+
+### Int64[10 000]
+| Method           | Mean     | Error     | StdDev    | Ratio |
+|----------------- |---------:|----------:|----------:|------:|
+| LinqSum          | 1.395 us | 0.0273 us | 0.0256 us |  0.34 |
+| ForSum           | 4.070 us | 0.0452 us | 0.0401 us |  1.00 |
+| SpanForSum       | 3.000 us | 0.0496 us | 0.0464 us |  0.74 |
+| UnrolledForSum   | 2.510 us | 0.0467 us | 0.0437 us |  0.62 |
+| VectorizedForSum | 1.480 us | 0.0275 us | 0.0257 us |  0.36 |
+
+### Int128[10 000]
+| Method           | Mean     | Error     | StdDev    | Ratio | 
+|----------------- |---------:|----------:|----------:|------:|
+| LinqAggregate    | 9.961 us | 0.1430 us | 0.1338 us |  1.07 | 
+| ForSum           | 9.319 us | 0.0752 us | 0.0628 us |  1.00 | 
+| SpanForSum       | 7.311 us | 0.1149 us | 0.1075 us |  0.78 | 
+| UnrolledForSum   | 7.517 us | 0.1129 us | 0.1056 us |  0.81 | 
+| VectorizedForSum | 6.404 us | 0.1079 us | 0.1010 us |  0.69 | 
+
+### Commentary
+1. .Net9 have optimized some LINQ query, and we see it with the Aggregate function which got a large performance gain (-50%).
+2. General optimizations deliver up to -20% gain, and at wrose same performance that .net8.
+3. The special case of the LINQ Cast+Sum function is the only exception with a +20% performance degradation.
+
+* Optimized LINQ expression looks great, with the Aggregate function being as fast as the for loop now!
