@@ -202,7 +202,7 @@ Update to 8.0 as Linq now use intinsics.
 
 ### Commentary
 1. .Net9 have optimized some LINQ query, and we see it with the Aggregate function which got a large performance gain (-50%).
-2. General optimizations deliver up to -20% gain, and at wrose same performance that .net8.
+2. General optimizations deliver up to -20% gain and at least the same performance that .net8.
 3. The special case of the LINQ Cast+Sum function is the only exception with a +20% performance degradation.
 
-* Optimized LINQ expression looks great, with the Aggregate function being as fast as the for loop now!
+* Optimized LINQ expression looks great with the Aggregate function being as fast as the for loop now!
