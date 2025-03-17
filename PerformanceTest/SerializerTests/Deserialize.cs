@@ -62,6 +62,8 @@ public class Deserialize
         cerasSerializedWithCycle = cerasSerializerWithReference.Serialize(dataCycle);
     }
 
+
+
     [Benchmark]
     public void StjWithoutReference()
         => JsonSerializer.Deserialize<List<A>>(stjSerializedWithoutReference, jsonOptions);
