@@ -23,86 +23,46 @@ public class Serialize
     [GlobalSetup]
     public void GlobalSetup()
     {
-        data = A.Seed(10, false);
-        dataCycle = A.Seed(10, true);
+        data = A.Seed(25, false);
+        dataCycle = A.Seed(25, true);
 
         jsonOptions = new JsonSerializerOptions() { ReferenceHandler = null };
-        messagePackSerializer = new MessagePackSerializer() { PreserveReferences = false };
+        messagePackSerializer = new MessagePackSerializer() { PreserveReferences =  ReferencePreservationMode.Off };
         cerasSerializer = new CerasSerializer(new() { PreserveReferences = false });
         CerasBufferPool.Pool = new CerasDefaultBufferPool();
 
         jsonOptionsWithReference = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.Preserve };
-        messagePackSerializerWithReference = new MessagePackSerializer() { PreserveReferences = true };
+        messagePackSerializerWithReference = new MessagePackSerializer() { PreserveReferences = ReferencePreservationMode.AllowCycles };
         cerasSerializerWithReference = new CerasSerializer(new() { PreserveReferences = true });
     }
 
     [Benchmark]
     public void StjWithoutReference()
-    {
-        var serialized = JsonSerializer.Serialize(data, jsonOptions);
-        var deserialized = JsonSerializer.Deserialize<List<A>>(serialized, jsonOptions);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
+        => JsonSerializer.Serialize(data, jsonOptions);
     [Benchmark]
     public void MsgPackWithoutReference()
-    {
-        var serialized = messagePackSerializer.Serialize<List<A>, ListAWitness>(data);
-        var deserialized = messagePackSerializer.Deserialize<List<A>, ListAWitness>(serialized);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
+        => messagePackSerializer.Serialize<List<A>, ListAWitness>(data);
     [Benchmark]
     public void CerasWithoutReference()
-    {
-        var serialized = cerasSerializer.Serialize(data);
-        var deserialized = cerasSerializer.Deserialize<List<A>>(serialized);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
-
-
+        => cerasSerializer.Serialize(data);
 
     [Benchmark]
     public void StjWithReference()
-    {
-        var serialized = JsonSerializer.Serialize(data, jsonOptionsWithReference);
-        var deserialized = JsonSerializer.Deserialize<List<A>>(serialized, jsonOptionsWithReference);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
+        => JsonSerializer.Serialize(data, jsonOptionsWithReference);
     [Benchmark]
     public void MsgPackWithReference()
-    {
-        var serialized = messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(data);
-        var deserialized = messagePackSerializerWithReference.Deserialize<List<A>, ListAWitness>(serialized);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
+        => messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(data);
     [Benchmark]
     public void CerasWithReference()
-    {
-        var serialized = cerasSerializerWithReference.Serialize(data);
-        var deserialized = cerasSerializerWithReference.Deserialize<List<A>>(serialized);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
-
-
+        => cerasSerializerWithReference.Serialize(data);
 
     [Benchmark]
     public void StjWithCycle()
-    {
-        var serialized = JsonSerializer.Serialize(dataCycle, jsonOptionsWithReference);
-        var deserialized = JsonSerializer.Deserialize<List<A>>(serialized, jsonOptionsWithReference);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
-    //[Benchmark]
-    //public void MsgPackWithCycle()
-    //{
-    //    var serialized = messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(dataCycle);
-    //    var deserialized = messagePackSerializerWithReference.Deserialize<List<A>, ListAWitness>(serialized);
-    //    if (deserialized.Count == 0) throw new InvalidOperationException();
-    //}
+        => JsonSerializer.Serialize(dataCycle, jsonOptionsWithReference);
+    [Benchmark]
+    public void MsgPackWithCycle()
+        => messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(dataCycle);
     [Benchmark]
     public void CerasWithCycle()
-    {
-        var serialized = cerasSerializerWithReference.Serialize(dataCycle);
-        var deserialized = cerasSerializerWithReference.Deserialize<List<A>>(serialized);
-        if (deserialized.Count == 0) throw new InvalidOperationException();
-    }
+        => cerasSerializerWithReference.Serialize(dataCycle);
 }
