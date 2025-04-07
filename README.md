@@ -18,13 +18,13 @@ MemoryPack is the hardest to setup (no easy way to do a "witness" type), so it d
 | StjWithReference         | 702.09 us |  6.995 us |  5.841 us |  1.28 |    0.01 | 516.46 KB |        1.45 |
 | StjTypedWithReference    | 685.16 us |  7.986 us |  7.470 us |  1.25 |    0.02 | 527.44 KB |        1.48 |
 | MsgPackWithReference     | 208.93 us |  2.749 us |  2.437 us |  0.38 |    0.01 |  34.49 KB |        0.10 |
-| MemPackWithReference     | 201.51 us |  1.841 us |  1.722 us |  0.37 |    0.00 |  90.51 KB |        0.25 |
 | CerasWithReference       | 103.62 us |  1.991 us |  1.663 us |  0.19 |    0.00 |  54.43 KB |        0.15 |
+| MemPackWithReference     | 201.51 us |  1.841 us |  1.722 us |  0.37 |    0.00 |  90.51 KB |        0.25 |
 | StjWithCycle             | 782.53 us | 11.402 us | 10.666 us |  1.43 |    0.02 | 538.58 KB |        1.51 |
 | StjTypedWithCycle        | 743.53 us |  5.553 us |  5.194 us |  1.36 |    0.01 | 549.09 KB |        1.54 |
 | MsgPackWithCycle         | 253.70 us |  4.830 us |  4.518 us |  0.46 |    0.01 |  48.13 KB |        0.14 |
-| MemPackWithCycle         | 212.43 us |  1.458 us |  1.218 us |  0.39 |    0.00 |  93.46 KB |        0.26 |
 | CerasWithCycle           | 116.66 us |  0.647 us |  0.573 us |  0.21 |    0.00 |   55.4 KB |        0.16 |
+| MemPackWithCycle         | 212.43 us |  1.458 us |  1.218 us |  0.39 |    0.00 |  93.46 KB |        0.26 |
 
 ## Deserialization
 | Method                   | Mean       | Error    | StdDev   | Ratio | RatioSD | Allocated | Alloc Ratio |
@@ -36,13 +36,13 @@ MemoryPack is the hardest to setup (no easy way to do a "witness" type), so it d
 | StjWithReference         |   949.0 us | 10.21 us |  9.55 us |  1.31 |    0.02 | 335.18 KB |        1.70 |
 | StjTypedWithReference    |   963.8 us | 12.90 us | 12.07 us |  1.33 |    0.02 | 335.18 KB |        1.70 |
 | MsgPackWithReference     |   177.9 us |  1.78 us |  1.58 us |  0.25 |    0.00 | 195.87 KB |        0.99 |
-| MemPackWithReference     |   115.9 us |  1.48 us |  1.31 us |  0.16 |    0.00 | 171.62 KB |        0.87 |
 | CerasWithReference       |   161.1 us |  2.51 us |  2.68 us |  0.22 |    0.00 | 192.24 KB |        0.97 |
+| MemPackWithReference     |   115.9 us |  1.48 us |  1.31 us |  0.16 |    0.00 | 171.62 KB |        0.87 |
 | StjWithCycle             | 1,157.8 us | 19.01 us | 15.87 us |  1.60 |    0.03 |  369.4 KB |        1.87 |
 | StjTypedWithCycle        | 1,158.3 us | 17.14 us | 15.20 us |  1.60 |    0.03 |  369.4 KB |        1.87 |
 | MsgPackWithCycle         |   292.3 us |  2.79 us |  2.61 us |  0.40 |    0.01 | 195.87 KB |        0.99 |
-| MemPackWithCycle         |   126.5 us |  1.02 us |  0.86 us |  0.17 |    0.00 | 171.62 KB |        0.87 |
 | CerasWithCycle           |   168.5 us |  2.10 us |  1.76 us |  0.23 |    0.00 | 192.24 KB |        0.97 |
+| MemPackWithCycle         |   126.5 us |  1.02 us |  0.86 us |  0.17 |    0.00 | 171.62 KB |        0.87 |
 
 ## Commentary
 Ceras is the fastest to serialize and MemoryPack is the fastest to deserialize.
