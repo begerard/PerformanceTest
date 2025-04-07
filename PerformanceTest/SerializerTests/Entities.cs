@@ -1,9 +1,7 @@
 ﻿using PolyType;
+using System.Text.Json.Serialization;
 
 namespace SerializerTests;
-
-[GenerateShape<List<A>>]
-partial class ListAWitness;
 
 public class A
 {
@@ -91,3 +89,16 @@ public class C
 }
 
 public enum EnumX { None, One, Two, Three }
+
+[GenerateShape<List<A>>]
+partial class ListAWitness;
+
+[JsonSerializable(typeof(A))]
+[JsonSerializable(typeof(B))]
+[JsonSerializable(typeof(C))]
+
+[JsonSerializable(typeof(List<A>))]
+[JsonSerializable(typeof(List<B>))]
+[JsonSerializable(typeof(List<C>))]
+[JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+internal partial class SourceGenerationContext : JsonSerializerContext { }
