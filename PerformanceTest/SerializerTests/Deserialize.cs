@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Ceras;
+using MemoryPack;
 using Nerdbank.MessagePack;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -30,11 +31,13 @@ public class Deserialize
     string stjSerializedWithReference;
     string stjTypedSerializedWithReference;
     byte[] msgPackSerializedWithReference;
+    byte[] memPackSerializedWithReference;
     byte[] cerasSerializedWithReference;
 
     string stjSerializedWithCycle;
     string stjTypedSerializedWithCycle;
     byte[] msgPackSerializedWithCycle;
+    byte[] memPackSerializedWithCycle;
     byte[] cerasSerializedWithCycle;
 
     [GlobalSetup]
@@ -64,11 +67,13 @@ public class Deserialize
         stjSerializedWithReference = JsonSerializer.Serialize(data, jsonOptionsWithReference);
         stjTypedSerializedWithReference = JsonSerializer.Serialize(data, jsonOptionsTypedWithReference);
         msgPackSerializedWithReference = messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(data);
+        memPackSerializedWithReference = MemoryPackSerializer.Serialize(data);
         cerasSerializedWithReference = cerasSerializerWithReference.Serialize(data);
 
         stjSerializedWithCycle = JsonSerializer.Serialize(dataCycle, jsonOptionsWithReference);
         stjTypedSerializedWithCycle = JsonSerializer.Serialize(dataCycle, jsonOptionsTypedWithReference);
         msgPackSerializedWithCycle = messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(dataCycle);
+        memPackSerializedWithCycle = MemoryPackSerializer.Serialize(dataCycle);
         cerasSerializedWithCycle = cerasSerializerWithReference.Serialize(dataCycle);
     }
 
@@ -97,6 +102,9 @@ public class Deserialize
     public void MsgPackWithReference()
         => messagePackSerializerWithReference.Deserialize<List<A>, ListAWitness>(msgPackSerializedWithReference);
     [Benchmark]
+    public void MemPackWithReference()
+        => MemoryPackSerializer.Deserialize<List<A>>(memPackSerializedWithReference);
+    [Benchmark]
     public void CerasWithReference()
         => cerasSerializerWithReference.Deserialize<List<A>>(cerasSerializedWithReference);
 
@@ -109,6 +117,9 @@ public class Deserialize
     [Benchmark]
     public void MsgPackWithCycle()
         => messagePackSerializerWithReference.Deserialize<List<A>, ListAWitness>(msgPackSerializedWithCycle);
+    [Benchmark]
+    public void MemPackWithCycle()
+        => MemoryPackSerializer.Deserialize<List<A>>(memPackSerializedWithCycle);
     [Benchmark]
     public void CerasWithCycle()
         => cerasSerializerWithReference.Deserialize<List<A>>(cerasSerializedWithCycle);

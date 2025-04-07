@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Ceras;
+using MemoryPack;
 using Nerdbank.MessagePack;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -63,6 +64,9 @@ public class Serialize
     public void MsgPackWithReference()
         => messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(data);
     [Benchmark]
+    public void MemPackWithReference()
+        => MemoryPackSerializer.Serialize(data);
+    [Benchmark]
     public void CerasWithReference()
         => cerasSerializerWithReference.Serialize(data);
 
@@ -75,6 +79,9 @@ public class Serialize
     [Benchmark]
     public void MsgPackWithCycle()
         => messagePackSerializerWithReference.Serialize<List<A>, ListAWitness>(dataCycle);
+    [Benchmark]
+    public void MemPackWithCycle()
+        => MemoryPackSerializer.Serialize(dataCycle);
     [Benchmark]
     public void CerasWithCycle()
         => cerasSerializerWithReference.Serialize(dataCycle);
