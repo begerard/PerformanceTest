@@ -1,4 +1,53 @@
-# PerformanceTest
+# SerializerTests
+
+Performance comparaison of both serialization and deserialization for several serializers in 3 modes: no referenced data, referenced data without cycle, referenced data with cycles.
+1. Stj = System.Text.Json
+2. StjTyped = System.Text.Json with a SourceGenerationContext
+3. MsgPack = Nerdbank.MessagePack
+4. MemPack = Cysharp.MemoryPack
+
+MemoryPack is the hardest to setup (no easy way to do a "witness" type), so it don't have a "no reference" mesurement.
+
+## Serialization
+| Method                   | Mean      | Error     | StdDev    | Ratio | RatioSD | Allocated | Alloc Ratio |
+|------------------------- |----------:|----------:|----------:|------:|--------:|----------:|------------:|
+| StjWithoutReference      | 547.42 us |  5.103 us |  4.524 us |  1.00 |    0.01 | 356.35 KB |        1.00 |
+| StjTypedWithoutReference | 568.14 us |  5.760 us |  5.388 us |  1.04 |    0.01 |  366.6 KB |        1.03 |
+| MsgPackWithoutReference  | 125.25 us |  1.008 us |  0.893 us |  0.23 |    0.00 |  34.49 KB |        0.10 |
+| CerasWithoutReference    |  74.72 us |  0.334 us |  0.296 us |  0.14 |    0.00 |  54.43 KB |        0.15 |
+| StjWithReference         | 702.09 us |  6.995 us |  5.841 us |  1.28 |    0.01 | 516.46 KB |        1.45 |
+| StjTypedWithReference    | 685.16 us |  7.986 us |  7.470 us |  1.25 |    0.02 | 527.44 KB |        1.48 |
+| MsgPackWithReference     | 208.93 us |  2.749 us |  2.437 us |  0.38 |    0.01 |  34.49 KB |        0.10 |
+| MemPackWithReference     | 201.51 us |  1.841 us |  1.722 us |  0.37 |    0.00 |  90.51 KB |        0.25 |
+| CerasWithReference       | 103.62 us |  1.991 us |  1.663 us |  0.19 |    0.00 |  54.43 KB |        0.15 |
+| StjWithCycle             | 782.53 us | 11.402 us | 10.666 us |  1.43 |    0.02 | 538.58 KB |        1.51 |
+| StjTypedWithCycle        | 743.53 us |  5.553 us |  5.194 us |  1.36 |    0.01 | 549.09 KB |        1.54 |
+| MsgPackWithCycle         | 253.70 us |  4.830 us |  4.518 us |  0.46 |    0.01 |  48.13 KB |        0.14 |
+| MemPackWithCycle         | 212.43 us |  1.458 us |  1.218 us |  0.39 |    0.00 |  93.46 KB |        0.26 |
+| CerasWithCycle           | 116.66 us |  0.647 us |  0.573 us |  0.21 |    0.00 |   55.4 KB |        0.16 |
+
+## Deserialization
+| Method                   | Mean       | Error    | StdDev   | Ratio | RatioSD | Allocated | Alloc Ratio |
+|------------------------- |-----------:|---------:|---------:|------:|--------:|----------:|------------:|
+| StjWithoutReference      |   724.8 us |  8.62 us |  7.20 us |  1.00 |    0.01 | 197.24 KB |        1.00 |
+| StjTypedWithoutReference |   740.4 us |  7.28 us |  6.81 us |  1.02 |    0.01 | 197.24 KB |        1.00 |
+| MsgPackWithoutReference  |   133.6 us |  1.55 us |  1.45 us |  0.18 |    0.00 | 195.87 KB |        0.99 |
+| CerasWithoutReference    |   109.8 us |  0.68 us |  0.57 us |  0.15 |    0.00 | 192.24 KB |        0.97 |
+| StjWithReference         |   949.0 us | 10.21 us |  9.55 us |  1.31 |    0.02 | 335.18 KB |        1.70 |
+| StjTypedWithReference    |   963.8 us | 12.90 us | 12.07 us |  1.33 |    0.02 | 335.18 KB |        1.70 |
+| MsgPackWithReference     |   177.9 us |  1.78 us |  1.58 us |  0.25 |    0.00 | 195.87 KB |        0.99 |
+| MemPackWithReference     |   115.9 us |  1.48 us |  1.31 us |  0.16 |    0.00 | 171.62 KB |        0.87 |
+| CerasWithReference       |   161.1 us |  2.51 us |  2.68 us |  0.22 |    0.00 | 192.24 KB |        0.97 |
+| StjWithCycle             | 1,157.8 us | 19.01 us | 15.87 us |  1.60 |    0.03 |  369.4 KB |        1.87 |
+| StjTypedWithCycle        | 1,158.3 us | 17.14 us | 15.20 us |  1.60 |    0.03 |  369.4 KB |        1.87 |
+| MsgPackWithCycle         |   292.3 us |  2.79 us |  2.61 us |  0.40 |    0.01 | 195.87 KB |        0.99 |
+| MemPackWithCycle         |   126.5 us |  1.02 us |  0.86 us |  0.17 |    0.00 | 171.62 KB |        0.87 |
+| CerasWithCycle           |   168.5 us |  2.10 us |  1.76 us |  0.23 |    0.00 | 192.24 KB |        0.97 |
+
+## Commentary
+Ceras is the fastest to serialize and MemoryPack is the fastest to deserialize.
+
+# SumTests
 
 Some tests about performance and optimization with different version of .Net on a simple Sum operation.
 Uses BenchmarkDotNet for time measurements.
