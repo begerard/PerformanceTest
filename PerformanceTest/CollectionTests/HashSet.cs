@@ -1,17 +1,17 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System.Collections;
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 
 namespace CollectionTests;
 
-[MemoryDiagnoser(false)]
 public class HashSet
 {
     private const int N = 10000;
     private const int TARGET = N + 1;
     private readonly List<int> source;
+    private readonly FrozenSet<int> frozenData;
     private readonly HashSet<int> mutableData;
-    private readonly HashSetWrapper<int> mutableIEnumerableData;
     private readonly ImmutableHashSet<int> immutableData;
     private readonly ImmutableHashSetWrapper<int> immutableIEnumerableData;
 
@@ -24,42 +24,33 @@ public class HashSet
         source.Add(TARGET);
         source.AddRange(Enumerable.Range(N * 2, N * 3));
 
+        frozenData = [.. source];
         mutableData = [.. source];
-        mutableIEnumerableData = new HashSetWrapper<int>(mutableData);
-
         immutableData = [.. source];
         immutableIEnumerableData = new ImmutableHashSetWrapper<int>(immutableData);
     }
 
     [Benchmark(Baseline = true)]
-    public int mutableHastSetFirst() => mutableData.FirstOrDefault(b => b == Target);
+    public int ImmutableHastSetWhereEvenFirst() => immutableData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
     [Benchmark]
-    public int mutableIEnumerableFirst() => mutableIEnumerableData.FirstOrDefault(b => b == Target);
+    public int ImmutableHastSetWhereEvenForEach() { foreach (var b in immutableData) if (b % 2 == 1 && b == Target) return b; return 0; }
+    [Benchmark]
+    public int ImmutableIEnumerableWhereEvenFirst() => immutableIEnumerableData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
 
     [Benchmark]
-    public int immutableHastSetFirst() => immutableData.FirstOrDefault(b => b == Target);
+    public int MutableHastSetWhereEvenFirst() => mutableData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
     [Benchmark]
-    public int immutableIEnumerableFirst() => immutableIEnumerableData.FirstOrDefault(b => b == Target);
+    public int MutableHastSetWhereEvenForEach() { foreach (var b in mutableData) if (b % 2 == 1 && b == Target) return b; return 0; }
 
     [Benchmark]
-    public int mutableHastSetWhereEvenFirst() => mutableData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
+    public int FrozenSetWhereEvenFirst() => frozenData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
     [Benchmark]
-    public int mutableIEnumerableWhereEvenFirst() => mutableIEnumerableData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
-    [Benchmark]
-    public int mutableIEnumerableWhereEvenForEach() { foreach (var b in mutableIEnumerableData) if (b % 2 == 1 && b == Target) return b; return 0; }
+    public int FrozenSetWhereEvenForEach() { foreach (var b in frozenData) if (b % 2 == 1 && b == Target) return b; return 0; }
 
     [Benchmark]
-    public int immutableHastSetWhereEvenFirst() => immutableData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
+    public int ListWhereEvenFirst() => source.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
     [Benchmark]
-    public int immutableIEnumerableWhereEvenFirst() => immutableIEnumerableData.Where(b => b % 2 == 1).FirstOrDefault(b => b == Target);
-    [Benchmark]
-    public int immutableIEnumerableWhereEvenForEach() { foreach (var b in immutableIEnumerableData) if (b % 2 == 1 && b == Target) return b; return 0; }
-
-    private class HashSetWrapper<T>(HashSet<T> set) : IEnumerable<T>
-    {
-        public IEnumerator<T> GetEnumerator() => set.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
+    public int ListSetWhereEvenForEach() { foreach (var b in source) if (b % 2 == 1 && b == Target) return b; return 0; }
 
     private class ImmutableHashSetWrapper<T>(ImmutableHashSet<T> set) : IEnumerable<T>
     {
