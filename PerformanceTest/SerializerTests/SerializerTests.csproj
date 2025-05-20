@@ -10,16 +10,7 @@
 		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
 		<PackageReference Include="Ceras" Version="4.1.7" />
 		<PackageReference Include="MemoryPack" Version="1.21.4" />
-		<PackageReference Include="Microsoft.NET.StringTools" Version="17.13.9" />
-		<PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.8.8" />
-		<PackageReference Include="Nerdbank.MessagePack" Version="0.5.37-beta" />
-		<PackageReference Include="System.IO.Pipelines" Version="9.0.3" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Reference Include="Nerdbank.MessagePack">
-	    <HintPath>..\..\dep\Nerdbank.MessagePack.dll</HintPath>
-	  </Reference>
+		<PackageReference Include="Nerdbank.MessagePack" Version="0.5.80-beta" />
 	</ItemGroup>
 
 </Project>
